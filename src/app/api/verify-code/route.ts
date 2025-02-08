@@ -1,68 +1,64 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User";
-import { POST } from "../sign-up/route";
+import { NextResponse } from "next/server";
 
+export async function POST(request: Request) {
+    await dbConnect();
 
-export async funtion POST(request:Request){
-    await dbConnect()
+    try {
+        const { username, code } = await request.json();
 
-    try{
-        const {username,code}=await request.json()
-
-        const decodedUsername = decodeURIComponent(username)
-        const user = await UserModel.findOne({username:decodedUsername})
-        if(!user){
-            return Response.json(
+        const decodedUsername = decodeURIComponent(username);
+        const user = await UserModel.findOne({ username: decodedUsername });
+        if (!user) {
+            return NextResponse.json(
                 {
-                    success:false,
-                    message:"User not found"
+                    success: false,
+                    message: "User not found"
                 },
-                {status : 500}
-            )
+                { status: 500 }
+            );
         }
 
-        const isCodeValid = user.verifyCode === code
-        const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date()
+        const isCodeValid = user.verifyCode === code;
+        const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
 
-        if(isCodeValid && isCodeNotExpired){
-            user.isVerified = true
-            await user.save()
+        if (isCodeValid && isCodeNotExpired) {
+            user.isVerified = true;
+            await user.save();
 
-            return Response.json(
+            return NextResponse.json(
                 {
-                    success:true,
-                    message:"Account verified successfully"
+                    success: true,
+                    message: "Account verified successfully"
                 },
-                {status : 200}
-            )
-        }
-        else if(!isCodeNotExpired){
-            return Response.json(
+                { status: 200 }
+            );
+        } else if (!isCodeNotExpired) {
+            return NextResponse.json(
                 {
-                    success:false,
-                    message:"Verification code has expired,please signup again to get a new code "
+                    success: false,
+                    message: "Verification code has expired, please sign up again to get a new code"
                 },
-                {status : 200}
-            ) 
-        }
-        else{
-            return Response.json(
+                { status: 200 }
+            );
+        } else {
+            return NextResponse.json(
                 {
-                    success:false,
-                    message:"Incorrect Verification code "
+                    success: false,
+                    message: "Incorrect verification code"
                 },
-                {status : 200}
-            ) 
+                { status: 200 }
+            );
         }
-    }
-    catch(error){
-        console.error("Error verifying user",error);
-        return Response.json(
+    } catch (error) {
+        console.error("Error verifying user", error);
+        return NextResponse.json(
             {
-                success:false,
-                message:"Error verifying user"
+                success: false,
+                message: "Error verifying user"
             },
-            {status : 500}
-        )
+            { status: 500 }
+        );
     }
 }

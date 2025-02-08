@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Html,
   Head,
-  Font,
   Preview,
   Heading,
   Row,
@@ -22,10 +21,9 @@ const VerificationEmail: React.FC<VerificationEmailProps> = ({ username, otp, ve
   return (
     <Html>
       <Head>
-        <Font
-          fontFamily="Roboto"
-          fallbackFontFamily="Arial"
-          webFontUrl="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet"
         />
       </Head>
       <Preview>{isVerified ? "Your email is verified" : "Verify your email address"}</Preview>
